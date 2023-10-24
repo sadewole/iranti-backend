@@ -9,8 +9,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  login(@Body() body: LocalAuthDto) {
-    return this.authService.login(body);
+  async login(@Body() body: LocalAuthDto) {
+    const user = await this.authService.validateLogin(body);
+    return this.authService.login({ user });
   }
 
   @Post('register')
