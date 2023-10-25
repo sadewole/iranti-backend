@@ -32,13 +32,13 @@ import enviroments from 'src/common/enviroments';
       }),
       inject: [ConfigService],
     }),
-    CacheModule.registerAsync({
+    CacheModule.register({
+      isGlobal: true,
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) =>
         <RedisClientOptions>{
           store: redisStore,
-          url: configService.get('redis_url'),
-          isGlobal: true,
+          url: configService.get('redis.url'),
         },
       inject: [ConfigService],
     }),

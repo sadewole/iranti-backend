@@ -1,6 +1,7 @@
 import {
   ConflictException,
   ForbiddenException,
+  Inject,
   Injectable,
   Logger,
 } from '@nestjs/common';
@@ -10,11 +11,14 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PasswordService } from './password.service';
 import { JwtService } from '@nestjs/jwt';
-import { generateExpiryCode } from 'src/common/utils';
+import { REDIS_KEYS, generateExpiryCode } from 'src/common/helpers';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private readonly passwordService: PasswordService,
@@ -42,7 +46,7 @@ export class AuthService {
   }
 
   async login({ user }: { user: User }) {
-    return await this.generateToken(user);
+    return this.signedUserToken(user);
   }
 
   async register(body: LocalAuthDto) {
@@ -50,28 +54,30 @@ export class AuthService {
       const hashPassword = await this.passwordService.hashPassword(
         body.password,
       );
-
-      const { code } = generateExpiryCode();
-
+      const { code, expiryMin } = generateExpiryCode();
       console.log('code', code);
-
       const user = await this.usersRepository.save({
         ...body,
         password: hashPassword,
       });
+      await this.cacheManager.set(
+        `${REDIS_KEYS.VERIFY_EMAIL_TOKEN}:${1}`,
+        code,
+        expiryMin,
+      );
 
-      delete user.password;
-      return this.generateToken(user);
+      return this.signedUserToken(user);
     } catch (error) {
       this.logger.error(error);
       throw new ConflictException('User already exists');
     }
   }
 
-  async generateToken(user: User) {
+  signedUserToken(user: User) {
     const payload = { email: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
+      isVerified: user.isVerified,
     };
   }
 }

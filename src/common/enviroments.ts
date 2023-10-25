@@ -7,5 +7,10 @@ export default () => ({
     name: process.env.DB_NAME,
   },
   jwt_secret: process.env.JWT_SECRET,
-  redis_url: process.env.REDIS_URL,
+  redis: {
+    url: process.env.REDIS_URL,
+    password: process.env.REDIS_PASSWORD,
+    port: process.env.REDIS_PORT,
+    host: process.env.REDIS_HOST,
+  },
 });
