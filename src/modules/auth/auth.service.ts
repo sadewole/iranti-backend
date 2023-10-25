@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PasswordService } from './password.service';
 import { JwtService } from '@nestjs/jwt';
+import { generateExpiryCode } from 'src/common/utils';
 
 @Injectable()
 export class AuthService {
@@ -50,13 +51,17 @@ export class AuthService {
         body.password,
       );
 
+      const { code } = generateExpiryCode();
+
+      console.log('code', code);
+
       const user = await this.usersRepository.save({
         ...body,
         password: hashPassword,
       });
 
       delete user.password;
-      return user.email;
+      return this.generateToken(user);
     } catch (error) {
       this.logger.error(error);
       throw new ConflictException('User already exists');

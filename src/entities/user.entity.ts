@@ -6,6 +6,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export interface Verified {
+  code: string;
+  expireAt: Date;
+  isVerified: boolean;
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -16,6 +22,9 @@ export class User {
 
   @Column({ nullable: false })
   password: string;
+
+  @Column({ type: 'boolean', default: false })
+  verified: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
