@@ -4,8 +4,10 @@ import {
   Inject,
   Injectable,
   Logger,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { LocalAuthDto } from './auth.dto';
+import { LocalAuthDto, VerifyEmailDto } from './auth.dto';
 import { User } from 'src/entities';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -55,13 +57,13 @@ export class AuthService {
         body.password,
       );
       const { code, expiryMin } = generateExpiryCode();
-      console.log('code', code);
+
       const user = await this.usersRepository.save({
         ...body,
         password: hashPassword,
       });
       await this.cacheManager.set(
-        `${REDIS_KEYS.VERIFY_EMAIL_TOKEN}:${1}`,
+        `${REDIS_KEYS.VERIFY_EMAIL_TOKEN}:${user.id}`,
         code,
         expiryMin,
       );
@@ -71,6 +73,34 @@ export class AuthService {
       this.logger.error(error);
       throw new ConflictException('User already exists');
     }
+  }
+
+  async verifyEmail(body: VerifyEmailDto) {
+    const user = await this.usersRepository.findOneBy({ email: body.email });
+    if (!user) {
+      throw new NotFoundException('Email not found');
+    }
+    if (user.isVerified) {
+      throw new UnauthorizedException('Email already verified');
+    }
+
+    const getCode = await this.cacheManager.get(
+      `${REDIS_KEYS.VERIFY_EMAIL_TOKEN}:${user.id}`,
+    );
+
+    if (getCode !== body.code) {
+      throw new UnauthorizedException('Invalid verification code');
+    }
+
+    const updateUser = await this.usersRepository.save({
+      ...user,
+      isVerified: true,
+      password: undefined,
+    });
+
+    await this.cacheManager.del(`${REDIS_KEYS.VERIFY_EMAIL_TOKEN}:${user.id}`);
+
+    return updateUser;
   }
 
   signedUserToken(user: User) {
