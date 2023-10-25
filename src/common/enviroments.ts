@@ -6,4 +6,5 @@ export default () => ({
     password: process.env.DB_PASSWORD,
     name: process.env.DB_NAME,
   },
+  jwt_secret: process.env.JWT_SECRET,
 });

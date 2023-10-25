@@ -1,12 +1,20 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { LocalAuthDto } from './auth.dto';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './guards';
 
 @Controller('auth')
 @ApiBearerAuth()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('me')
+  async getMe(@Req() req) {
+    return req.user;
+  }
 
   @Post('login')
   async login(@Body() body: LocalAuthDto) {

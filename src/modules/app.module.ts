@@ -3,11 +3,13 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import entities from 'src/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserModule } from './user/user.module';
 import enviroments from 'src/common/enviroments';
 
 @Module({
   imports: [
     AuthModule,
+    UserModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [enviroments],

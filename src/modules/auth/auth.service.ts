@@ -28,7 +28,7 @@ export class AuthService {
       throw new ForbiddenException('Invalid crendentials');
     }
 
-    const isMatch = this.passwordService.comparePassword(
+    const isMatch = await this.passwordService.comparePassword(
       body.password,
       user.password,
     );
@@ -40,8 +40,8 @@ export class AuthService {
     return user;
   }
 
-  login({ user }: { user: User }) {
-    return user.email;
+  async login({ user }: { user: User }) {
+    return await this.generateToken(user);
   }
 
   async register(body: LocalAuthDto) {
