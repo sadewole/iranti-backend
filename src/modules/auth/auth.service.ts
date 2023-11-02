@@ -7,7 +7,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LocalAuthDto, VerifyEmailDto } from './auth.dto';
+import { LocalAuthDto, ResendCodeDto, VerifyEmailDto } from './auth.dto';
 import { User } from 'src/entities';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,7 +22,7 @@ export class AuthService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private userRepository: Repository<User>,
     private readonly passwordService: PasswordService,
     private jwtService: JwtService,
   ) {}
@@ -30,7 +30,7 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   async validateLogin(body: LocalAuthDto): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ email: body.email });
+    const user = await this.userRepository.findOneBy({ email: body.email });
     if (!user) {
       throw new ForbiddenException('Invalid crendentials');
     }
@@ -58,7 +58,7 @@ export class AuthService {
       );
       const { code, expiryMin } = generateExpiryCode();
 
-      const user = await this.usersRepository.save({
+      const user = await this.userRepository.save({
         ...body,
         password: hashPassword,
       });
@@ -75,8 +75,29 @@ export class AuthService {
     }
   }
 
+  async resendVerifyCode(body: ResendCodeDto) {
+    const user = await this.userRepository.findOneBy({ email: body.email });
+    if (!user) {
+      throw new NotFoundException('Email not found');
+    }
+    if (user.isVerified) {
+      throw new UnauthorizedException('Email already verified');
+    }
+
+    const { code, expiryMin } = generateExpiryCode();
+
+    await this.cacheManager.set(
+      `${REDIS_KEYS.VERIFY_EMAIL_TOKEN}:${user.id}`,
+      code,
+      expiryMin,
+    );
+
+    // TODO: Create a EMAIL notification
+    return { message: 'Verification code sent to email' };
+  }
+
   async verifyEmail(body: VerifyEmailDto) {
-    const user = await this.usersRepository.findOneBy({ email: body.email });
+    const user = await this.userRepository.findOneBy({ email: body.email });
     if (!user) {
       throw new NotFoundException('Email not found');
     }
@@ -92,7 +113,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid verification code');
     }
 
-    const updateUser = await this.usersRepository.save({
+    const updateUser = await this.userRepository.save({
       ...user,
       isVerified: true,
       password: undefined,

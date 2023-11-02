@@ -28,5 +28,6 @@ const jwtFactory = {
   ],
   controllers: [AuthController],
   providers: [AuthService, PasswordService, UserService, JwtStrategy],
+  exports: [AuthService, PasswordService],
 })
 export class AuthModule {}
