@@ -7,11 +7,13 @@ import * as redisStore from 'cache-manager-redis-store';
 import entities from 'src/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { NoteModule } from './note/note.module';
 import enviroments from 'src/common/enviroments';
 
 @Module({
   imports: [
     AuthModule,
+    NoteModule,
     UserModule,
     ConfigModule.forRoot({
       isGlobal: true,
