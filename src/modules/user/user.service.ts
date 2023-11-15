@@ -68,6 +68,8 @@ export class UserService {
       select: {
         id: true,
         email: true,
+        isVerified: true,
+        createdAt: true,
       },
     });
   }

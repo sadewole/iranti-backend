@@ -1,6 +1,5 @@
 import {
   ConflictException,
-  ForbiddenException,
   Inject,
   Injectable,
   Logger,
@@ -32,7 +31,7 @@ export class AuthService {
   async validateLogin(body: LocalAuthDto): Promise<User> {
     const user = await this.userRepository.findOneBy({ email: body.email });
     if (!user) {
-      throw new ForbiddenException('Invalid crendentials');
+      throw new UnauthorizedException('Invalid crendentials');
     }
 
     const isMatch = await this.passwordService.comparePassword(
@@ -40,7 +39,7 @@ export class AuthService {
       user.password,
     );
     if (!isMatch) {
-      throw new ForbiddenException('Invalid crendentials');
+      throw new UnauthorizedException('Invalid crendentials');
     }
 
     delete user.password;
@@ -57,7 +56,7 @@ export class AuthService {
         body.password,
       );
       const { code, expiryMin } = generateExpiryCode();
-
+      console.log('code', code);
       const user = await this.userRepository.save({
         ...body,
         password: hashPassword,

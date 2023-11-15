@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Cluster } from './cluster.entity';
 
 @Entity()
 export class User {
@@ -19,6 +21,9 @@ export class User {
 
   @Column({ type: 'boolean', default: false })
   isVerified: boolean;
+
+  @ManyToMany(() => Cluster, (cp) => cp.collaborators)
+  clusters: Cluster;
 
   @CreateDateColumn()
   createdAt: Date;

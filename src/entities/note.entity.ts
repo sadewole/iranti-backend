@@ -4,40 +4,49 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Cluster } from './cluster.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Note {
   @PrimaryGeneratedColumn('uuid')
+  @ApiProperty()
   id: string;
 
   @Column({ nullable: false })
+  @ApiProperty()
   title: string;
 
   @Column('text')
+  @ApiProperty()
   description: string;
 
-  @Column({ nullable: false })
+  @PrimaryColumn()
+  @ApiProperty()
   userId: string;
 
   @ManyToOne(() => User)
   @JoinColumn()
   user: User;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
+  @ApiProperty()
   clusterId: string;
 
-  @ManyToOne(() => Cluster)
-  @JoinColumn()
+  @ManyToOne(() => Cluster, { nullable: true })
+  @JoinColumn({ name: 'clusterId' })
   cluster: Cluster;
 
   @CreateDateColumn()
+  @ApiProperty()
   createdAt: Date;
 
   @UpdateDateColumn()
+  @ApiProperty()
   updatedAt: Date;
 }

@@ -3,13 +3,14 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
-import { ClusterCollaborator } from './cluster_collaborator.entity';
 import { Note } from './note.entity';
 
 @Entity()
@@ -30,8 +31,9 @@ export class Cluster {
   @JoinColumn()
   user: User;
 
-  @OneToMany(() => ClusterCollaborator, (cp) => cp.cluster)
-  collaborators: ClusterCollaborator[];
+  @ManyToMany(() => User, (cp) => cp.clusters)
+  @JoinTable()
+  collaborators: User[];
 
   @OneToMany(() => Note, (cp) => cp.cluster)
   notes: Note[];
