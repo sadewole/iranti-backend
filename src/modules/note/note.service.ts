@@ -21,7 +21,7 @@ export class NoteService {
   }
 
   async getUserClusters(user: User) {
-    return await this.clusterRepository.findOne({
+    const clusters = await this.clusterRepository.find({
       where: { userId: user.id },
       order: { createdAt: 'DESC' },
       relations: {
@@ -29,6 +29,15 @@ export class NoteService {
         notes: true,
       },
     });
+
+    // Transform collaborators to include only necessary property
+    const results = clusters.map((cls) => {
+      const collaborators = cls.collaborators.map(this.transformCollaborator);
+
+      return { ...cls, collaborators };
+    });
+
+    return results;
   }
 
   async createCluster(body: CreateClusterDto, user: User) {
@@ -51,7 +60,20 @@ export class NoteService {
     if (!cluster) {
       throw new NotFoundException('Cluster does not exist');
     }
-    return cluster;
+
+    const { user, collaborators, ...rest } = cluster;
+
+    // Transform collaborators to include only necessary property
+    const transformedCollabs = collaborators.map(this.transformCollaborator);
+
+    return {
+      ...rest,
+      collaborators: transformedCollabs,
+      owner: {
+        id: user.id,
+        email: user.email,
+      },
+    };
   }
 
   async createNote(body: CreateNoteDto, user: User): Promise<Note> {
@@ -64,5 +86,13 @@ export class NoteService {
       ...body,
       userId: user.id,
     });
+  }
+
+  transformCollaborator(user: User) {
+    return {
+      id: user.id,
+      email: user.email,
+      joinedDate: user.createdAt,
+    };
   }
 }

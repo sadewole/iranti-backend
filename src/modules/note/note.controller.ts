@@ -7,7 +7,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { Note } from 'src/entities';
+import { Cluster, Note } from 'src/entities';
 import { NoteService } from './note.service';
 import { CreateClusterDto, CreateNoteDto } from './note.dto';
 import { JwtAuthGuard, VerifiedUserGuard } from '../auth/guards';
@@ -32,13 +32,8 @@ export class NoteController {
     return await this.noteService.createNote(body, req.user);
   }
 
-  //   @Get('clusters')
-  //   @ApiOperation({ summary: 'Get all cluster' })
-  //   async getClusters() {
-  //     return await this.noteService.getClusters();
-  //   }
-
   @Get('cluster/mine')
+  @ApiResponse({ status: 200, description: 'All notes.', type: [Cluster] })
   @ApiOperation({ summary: 'fetch all my clusters' })
   async getUserClusters(@Req() req) {
     return await this.noteService.getUserClusters(req.user);
@@ -50,7 +45,7 @@ export class NoteController {
     return await this.noteService.getCluster(id);
   }
 
-  @Get('cluster')
+  @Post('cluster')
   @ApiOperation({ summary: 'Create new cluster' })
   async createCluster(@Body() body: CreateClusterDto, @Req() req) {
     return await this.noteService.createCluster(body, req.user);

@@ -12,19 +12,24 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { Note } from './note.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Cluster {
   @PrimaryGeneratedColumn('uuid')
+  @ApiProperty()
   id: string;
 
   @Column({ nullable: false })
+  @ApiProperty()
   name: string;
 
   @Column('text')
+  @ApiProperty()
   description: string;
 
   @Column({ nullable: false })
+  @ApiProperty()
   userId: string;
 
   @ManyToOne(() => User)
@@ -33,14 +38,18 @@ export class Cluster {
 
   @ManyToMany(() => User, (cp) => cp.clusters)
   @JoinTable()
+  @ApiProperty({ type: [User] })
   collaborators: User[];
 
   @OneToMany(() => Note, (cp) => cp.cluster)
+  @ApiProperty({ type: [Note] })
   notes: Note[];
 
   @CreateDateColumn()
+  @ApiProperty()
   createdAt: Date;
 
   @UpdateDateColumn()
+  @ApiProperty()
   updatedAt: Date;
 }

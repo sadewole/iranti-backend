@@ -40,6 +40,7 @@ export class Note {
 
   @ManyToOne(() => Cluster, { nullable: true })
   @JoinColumn({ name: 'clusterId' })
+  @ApiProperty({ type: () => Cluster })
   cluster: Cluster;
 
   @CreateDateColumn()
