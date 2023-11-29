@@ -30,14 +30,7 @@ export class NoteService {
       },
     });
 
-    // Transform collaborators to include only necessary property
-    const results = clusters.map((cls) => {
-      const collaborators = cls.collaborators.map(this.transformCollaborator);
-
-      return { ...cls, collaborators };
-    });
-
-    return results;
+    return clusters;
   }
 
   async createCluster(body: CreateClusterDto, user: User) {
@@ -62,17 +55,10 @@ export class NoteService {
     }
 
     const { user, collaborators, ...rest } = cluster;
-
-    // Transform collaborators to include only necessary property
-    const transformedCollabs = collaborators.map(this.transformCollaborator);
-
     return {
       ...rest,
-      collaborators: transformedCollabs,
-      owner: {
-        id: user.id,
-        email: user.email,
-      },
+      collaborators,
+      owner: user,
     };
   }
 
@@ -86,13 +72,5 @@ export class NoteService {
       ...body,
       userId: user.id,
     });
-  }
-
-  transformCollaborator(user: User) {
-    return {
-      id: user.id,
-      email: user.email,
-      joinedDate: user.createdAt,
-    };
   }
 }

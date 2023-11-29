@@ -37,7 +37,12 @@ export class UserService {
   }
 
   async resetPassword(body: ResetPasswordDto): Promise<User> {
-    const user = await this.userRepository.findOneBy({ email: body.email });
+    const user = await this.userRepository
+      .createQueryBuilder()
+      .where('User.email = :email', { email: body.email })
+      .addSelect('User.password')
+      .getOne();
+
     if (!user) {
       throw new UnauthorizedException('Invalid email address');
     }
@@ -62,15 +67,17 @@ export class UserService {
     return user;
   }
 
+  async getAllUsers() {
+    return await this.userRepository.find({
+      relations: {
+        collabClusters: true,
+      },
+    });
+  }
+
   async findUserById(id: string): Promise<User> {
     return await this.userRepository.findOne({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        isVerified: true,
-        createdAt: true,
-      },
     });
   }
 }

@@ -29,7 +29,12 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   async validateLogin(body: LocalAuthDto): Promise<User> {
-    const user = await this.userRepository.findOneBy({ email: body.email });
+    const user = await this.userRepository
+      .createQueryBuilder()
+      .where('User.email = :email', { email: body.email })
+      .addSelect('User.password')
+      .getOne();
+
     if (!user) {
       throw new UnauthorizedException('Invalid crendentials');
     }

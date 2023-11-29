@@ -16,14 +16,14 @@ export class User {
   @Column({ unique: true, nullable: false })
   email: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, select: false })
   password: string;
 
   @Column({ type: 'boolean', default: false })
   isVerified: boolean;
 
   @ManyToMany(() => Cluster, (cp) => cp.collaborators)
-  clusters: Cluster;
+  collabClusters: Cluster;
 
   @CreateDateColumn()
   createdAt: Date;

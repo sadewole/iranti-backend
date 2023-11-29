@@ -36,7 +36,7 @@ export class Cluster {
   @JoinColumn()
   user: User;
 
-  @ManyToMany(() => User, (cp) => cp.clusters)
+  @ManyToMany(() => User, (cp) => cp.collabClusters)
   @JoinTable()
   @ApiProperty({ type: [User] })
   collaborators: User[];
