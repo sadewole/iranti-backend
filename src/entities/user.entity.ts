@@ -8,6 +8,11 @@ import {
 } from 'typeorm';
 import { Cluster } from './cluster.entity';
 
+export enum Role {
+  User = 'User',
+  Admin = 'Admin',
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -25,9 +30,12 @@ export class User {
   @ManyToMany(() => Cluster, (cp) => cp.collaborators)
   collabClusters: Cluster;
 
-  @CreateDateColumn()
+  @Column({ type: 'enum', enum: Role, default: Role.User })
+  role: Role;
+
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }

@@ -1,10 +1,14 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 @Injectable()
 export class VerifiedUserGuard {
   constructor() {}
 
-  canActivate(context) {
+  canActivate(context: ExecutionContext) {
     const { user } = context.switchToHttp().getRequest();
     if (!user.isVerified) {
       throw new UnauthorizedException(

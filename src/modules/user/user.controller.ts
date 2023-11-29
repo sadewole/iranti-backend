@@ -1,8 +1,11 @@
-import { Body, Controller, Get, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { ResendCodeDto } from '../auth/auth.dto';
 import { UserService } from './user.service';
 import { ResetPasswordDto } from './user.dto';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { JwtAuthGuard, RolesGuard, VerifiedUserGuard } from '../auth/guards';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -10,6 +13,8 @@ export class UserController {
 
   @Get('all')
   @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, VerifiedUserGuard, RolesGuard)
+  @Roles(Role.Admin)
   async getAllUsers() {
     return await this.userService.getAllUsers();
   }
