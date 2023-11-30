@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { NoteService } from './note.service';
 import { NoteController } from './note.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Cluster, Note } from 'src/entities';
+import { Cluster, Note, User } from 'src/entities';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Note, Cluster])],
+  imports: [TypeOrmModule.forFeature([Note, Cluster, User])],
   providers: [NoteService],
   controllers: [NoteController],
 })

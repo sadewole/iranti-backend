@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cluster, Note, User } from 'src/entities';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateClusterDto, CreateNoteDto } from './note.dto';
 
 @Injectable()
@@ -9,6 +13,7 @@ export class NoteService {
   constructor(
     @InjectRepository(Note) private noteRepository: Repository<Note>,
     @InjectRepository(Cluster) private clusterRepository: Repository<Cluster>,
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
   async getNotes() {
@@ -43,7 +48,6 @@ export class NoteService {
   async getCluster(id: string) {
     const cluster = await this.clusterRepository.findOne({
       where: { id },
-      order: { createdAt: 'DESC' },
       relations: {
         user: true,
         notes: true,
@@ -60,6 +64,24 @@ export class NoteService {
       collaborators,
       owner: user,
     };
+  }
+
+  async addCollabCluster(id: string, user: User, body: string[]) {
+    const cluster = await this.getCluster(id);
+
+    if (cluster.userId === user.id) {
+      throw new BadRequestException('You already own this cluster.');
+    }
+
+    const users = await this.userRepository.find({
+      where: {
+        email: In(body),
+      },
+    });
+
+    cluster.collaborators = [...cluster.collaborators, ...users];
+
+    return await this.clusterRepository.save(cluster);
   }
 
   async createNote(body: CreateNoteDto, user: User): Promise<Note> {

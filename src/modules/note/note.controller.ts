@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -42,6 +43,22 @@ export class NoteController {
   @Get('cluster/:id')
   @ApiOperation({ summary: 'Get one cluster' })
   async getCluster(@Param('id') id: string) {
+    return await this.noteService.getCluster(id);
+  }
+
+  @Post('cluster/:id/collabs')
+  @ApiOperation({ summary: 'Add collaborators to cluster' })
+  async addCollabCluster(
+    @Req() req,
+    @Param('id') id: string,
+    @Body() body: string[],
+  ) {
+    return await this.noteService.addCollabCluster(id, req.user, body);
+  }
+
+  @Delete('cluster/:id/collab')
+  @ApiOperation({ summary: 'Delete collaborator from cluster' })
+  async deleteCollabCluster(@Param('id') id: string) {
     return await this.noteService.getCluster(id);
   }
 

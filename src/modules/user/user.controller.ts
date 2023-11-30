@@ -12,6 +12,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('all')
+  @ApiOperation({ summary: 'Admin - view all users' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, VerifiedUserGuard, RolesGuard)
   @Roles(Role.Admin)
