@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { LocalAuthDto, ResendCodeDto, VerifyEmailDto } from './auth.dto';
+import { LocalAuthDto, IsEmailDto, VerifyEmailDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards';
 
@@ -34,7 +34,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('resend_code')
-  async resendVerifyCode(@Body() body: ResendCodeDto) {
+  async resendVerifyCode(@Body() body: IsEmailDto) {
     return await this.authService.resendVerifyCode(body);
   }
 }

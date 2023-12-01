@@ -5,8 +5,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cluster, Note, User } from 'src/entities';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateClusterDto, CreateNoteDto } from './note.dto';
+import { IsEmailDto } from '../auth/auth.dto';
 
 @Injectable()
 export class NoteService {
@@ -66,22 +67,21 @@ export class NoteService {
     };
   }
 
-  async addCollabCluster(id: string, user: User, body: string[]) {
+  async addCollabCluster(id: string, user: User, body: IsEmailDto) {
     const cluster = await this.getCluster(id);
-
-    if (cluster.userId === user.id) {
+    if (body.email.toLowerCase() === user.email.toLowerCase()) {
       throw new BadRequestException('You already own this cluster.');
     }
 
-    const users = await this.userRepository.find({
-      where: {
-        email: In(body),
-      },
-    });
+    const collab = await this.userRepository.findOneBy({ email: body.email });
 
-    cluster.collaborators = [...cluster.collaborators, ...users];
+    cluster.collaborators = [...cluster.collaborators, collab];
 
     return await this.clusterRepository.save(cluster);
+  }
+
+  async deleteCollaborator(id: string) {
+    return id;
   }
 
   async createNote(body: CreateNoteDto, user: User): Promise<Note> {

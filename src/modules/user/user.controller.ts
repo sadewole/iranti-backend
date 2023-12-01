@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { ResendCodeDto } from '../auth/auth.dto';
+import { IsEmailDto } from '../auth/auth.dto';
 import { UserService } from './user.service';
 import { ResetPasswordDto } from './user.dto';
 import { JwtAuthGuard, RolesGuard, VerifiedUserGuard } from '../auth/guards';
@@ -22,7 +22,7 @@ export class UserController {
 
   @Post('forgot_password')
   @ApiOperation({ summary: 'Send code to reset password' })
-  async forgotPassword(@Body() body: ResendCodeDto) {
+  async forgotPassword(@Body() body: IsEmailDto) {
     return await this.userService.forgotPassword(body);
   }
 

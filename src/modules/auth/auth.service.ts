@@ -6,7 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LocalAuthDto, ResendCodeDto, VerifyEmailDto } from './auth.dto';
+import { LocalAuthDto, IsEmailDto, VerifyEmailDto } from './auth.dto';
 import { User } from 'src/entities';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -79,7 +79,7 @@ export class AuthService {
     }
   }
 
-  async resendVerifyCode(body: ResendCodeDto) {
+  async resendVerifyCode(body: IsEmailDto) {
     const user = await this.userRepository.findOneBy({ email: body.email });
     if (!user) {
       throw new NotFoundException('Email not found');

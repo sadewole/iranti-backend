@@ -26,7 +26,7 @@ export class VerifyEmailDto {
   code: string;
 }
 
-export class ResendCodeDto {
+export class IsEmailDto {
   @ApiProperty()
   @IsEmail()
   @IsNotEmpty()

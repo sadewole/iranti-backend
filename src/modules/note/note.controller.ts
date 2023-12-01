@@ -13,6 +13,7 @@ import { NoteService } from './note.service';
 import { CreateClusterDto, CreateNoteDto } from './note.dto';
 import { JwtAuthGuard, VerifiedUserGuard } from '../auth/guards';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { IsEmailDto } from '../auth/auth.dto';
 
 @Controller('note')
 @ApiBearerAuth()
@@ -51,7 +52,7 @@ export class NoteController {
   async addCollabCluster(
     @Req() req,
     @Param('id') id: string,
-    @Body() body: string[],
+    @Body() body: IsEmailDto,
   ) {
     return await this.noteService.addCollabCluster(id, req.user, body);
   }
@@ -59,7 +60,7 @@ export class NoteController {
   @Delete('cluster/:id/collab')
   @ApiOperation({ summary: 'Delete collaborator from cluster' })
   async deleteCollabCluster(@Param('id') id: string) {
-    return await this.noteService.getCluster(id);
+    return await this.noteService.deleteCollaborator(id);
   }
 
   @Post('cluster')

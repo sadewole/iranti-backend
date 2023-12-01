@@ -2,7 +2,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities';
 import { Repository } from 'typeorm';
-import { ResendCodeDto } from '../auth/auth.dto';
+import { IsEmailDto } from '../auth/auth.dto';
 import { REDIS_KEYS, generateExpiryCode } from 'src/common/helpers';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
@@ -17,7 +17,7 @@ export class UserService {
     private readonly passwordService: PasswordService,
   ) {}
 
-  async forgotPassword(body: ResendCodeDto) {
+  async forgotPassword(body: IsEmailDto) {
     const user = await this.userRepository.findOneBy({ email: body.email });
     const message = 'Password reset will be sent to email if valid';
     if (!user) {
@@ -78,6 +78,9 @@ export class UserService {
   async findUserById(id: string): Promise<User> {
     return await this.userRepository.findOne({
       where: { id },
+      relations: {
+        collabClusters: true,
+      },
     });
   }
 }
