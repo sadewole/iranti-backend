@@ -5,12 +5,13 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { Cluster, Note } from 'src/entities';
 import { NoteService } from './note.service';
-import { CreateClusterDto, CreateNoteDto } from './note.dto';
+import { CreateClusterDto, CreateNoteDto, UpdateClusterDto } from './note.dto';
 import { JwtAuthGuard, VerifiedUserGuard } from '../auth/guards';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { IsEmailDto } from '../auth/auth.dto';
@@ -47,7 +48,17 @@ export class NoteController {
     return await this.noteService.getCluster(id);
   }
 
-  @Post('cluster/:id/collabs')
+  @Put('cluster/:id')
+  @ApiOperation({ summary: 'update cluster' })
+  async updateCluster(
+    @Req() req,
+    @Param('id') id: string,
+    @Body() body: UpdateClusterDto,
+  ) {
+    return await this.noteService.updateCluster(id, req.user, body);
+  }
+
+  @Post('cluster/:id/collab')
   @ApiOperation({ summary: 'Add collaborators to cluster' })
   async addCollabCluster(
     @Req() req,
@@ -57,10 +68,13 @@ export class NoteController {
     return await this.noteService.addCollabCluster(id, req.user, body);
   }
 
-  @Delete('cluster/:id/collab')
+  @Delete('cluster/:id/collab/:collabId')
   @ApiOperation({ summary: 'Delete collaborator from cluster' })
-  async deleteCollabCluster(@Param('id') id: string) {
-    return await this.noteService.deleteCollaborator(id);
+  async deleteCollabCluster(
+    @Param('id') id: string,
+    @Param('collabId') collabId: string,
+  ) {
+    return await this.noteService.deleteCollaborator(id, collabId);
   }
 
   @Post('cluster')

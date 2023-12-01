@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cluster, Note, User } from 'src/entities';
 import { Repository } from 'typeorm';
-import { CreateClusterDto, CreateNoteDto } from './note.dto';
+import { CreateClusterDto, CreateNoteDto, UpdateClusterDto } from './note.dto';
 import { IsEmailDto } from '../auth/auth.dto';
 
 @Injectable()
@@ -67,6 +67,18 @@ export class NoteService {
     };
   }
 
+  async updateCluster(id: string, user: User, body: UpdateClusterDto) {
+    const cluster = await this.clusterRepository.findOneBy({
+      id,
+      userId: user.id,
+    });
+    if (!cluster) {
+      throw new NotFoundException('Cluster not found');
+    }
+
+    return await this.clusterRepository.save({ ...cluster, ...body });
+  }
+
   async addCollabCluster(id: string, user: User, body: IsEmailDto) {
     const cluster = await this.getCluster(id);
     if (body.email.toLowerCase() === user.email.toLowerCase()) {
@@ -80,8 +92,15 @@ export class NoteService {
     return await this.clusterRepository.save(cluster);
   }
 
-  async deleteCollaborator(id: string) {
-    return id;
+  async deleteCollaborator(id: string, collabId: string) {
+    const cluster = await this.getCluster(id);
+
+    cluster.collaborators = cluster.collaborators.filter(
+      (collab) => collab.id === collabId,
+    );
+    await this.clusterRepository.save(cluster);
+
+    return { message: 'Deleted sucessfully' };
   }
 
   async createNote(body: CreateNoteDto, user: User): Promise<Note> {
