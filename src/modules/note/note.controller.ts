@@ -18,9 +18,15 @@ import {
   UpdateNoteDto,
 } from './note.dto';
 import { JwtAuthGuard, VerifiedUserGuard } from '../auth/guards';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { IsEmailDto } from '../auth/auth.dto';
 
+@ApiTags('note')
 @Controller('note')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, VerifiedUserGuard)
