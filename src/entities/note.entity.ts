@@ -30,7 +30,7 @@ export class Note {
   @ApiProperty()
   userId: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 
@@ -38,7 +38,7 @@ export class Note {
   @ApiProperty()
   clusterId: string;
 
-  @ManyToOne(() => Cluster, { nullable: true })
+  @ManyToOne(() => Cluster, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'clusterId' })
   @ApiProperty({ type: () => Cluster })
   cluster: Cluster;

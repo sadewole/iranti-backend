@@ -32,7 +32,7 @@ export class Cluster {
   @ApiProperty()
   userId: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 

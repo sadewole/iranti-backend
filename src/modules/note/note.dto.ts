@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateNoteDto {
   @ApiProperty()
@@ -13,8 +13,8 @@ export class CreateNoteDto {
   description?: string;
 
   @ApiProperty({ required: false })
-  @IsString()
   @IsOptional()
+  @IsUUID()
   clusterId?: string;
 }
 
@@ -31,3 +31,4 @@ export class CreateClusterDto {
 }
 
 export class UpdateClusterDto extends PartialType(CreateClusterDto) {}
+export class UpdateNoteDto extends PartialType(CreateNoteDto) {}

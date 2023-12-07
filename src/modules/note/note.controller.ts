@@ -11,7 +11,12 @@ import {
 } from '@nestjs/common';
 import { Cluster, Note } from 'src/entities';
 import { NoteService } from './note.service';
-import { CreateClusterDto, CreateNoteDto, UpdateClusterDto } from './note.dto';
+import {
+  CreateClusterDto,
+  CreateNoteDto,
+  UpdateClusterDto,
+  UpdateNoteDto,
+} from './note.dto';
 import { JwtAuthGuard, VerifiedUserGuard } from '../auth/guards';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { IsEmailDto } from '../auth/auth.dto';
@@ -33,6 +38,34 @@ export class NoteController {
   @ApiOperation({ summary: 'Create a new note' })
   async createNote(@Req() req, @Body() body: CreateNoteDto): Promise<Note> {
     return await this.noteService.createNote(body, req.user);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get single note' })
+  async getNote(@Req() req, @Param('id') id: string): Promise<Note> {
+    return await this.noteService.getNote(id, req.user);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update note' })
+  async updateNote(
+    @Req() req,
+    @Param('id') id: string,
+    @Body() body: UpdateNoteDto,
+  ): Promise<Note> {
+    return await this.noteService.updateNote(id, req.user, body);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete note' })
+  async deleteNote(@Req() req, @Param('id') id: string) {
+    return await this.noteService.deleteNote(id, req.user);
+  }
+
+  @Post('cluster')
+  @ApiOperation({ summary: 'Create new cluster' })
+  async createCluster(@Body() body: CreateClusterDto, @Req() req) {
+    return await this.noteService.createCluster(body, req.user);
   }
 
   @Get('cluster/mine')
@@ -58,8 +91,14 @@ export class NoteController {
     return await this.noteService.updateCluster(id, req.user, body);
   }
 
+  @Delete('cluster/:id')
+  @ApiOperation({ summary: 'Delete cluster' })
+  async deleteCluster(@Req() req, @Param('id') id: string) {
+    return await this.noteService.deleteCluster(id, req.user);
+  }
+
   @Post('cluster/:id/collab')
-  @ApiOperation({ summary: 'Add collaborators to cluster' })
+  @ApiOperation({ summary: 'Add collaborator to cluster' })
   async addCollabCluster(
     @Req() req,
     @Param('id') id: string,
@@ -75,11 +114,5 @@ export class NoteController {
     @Param('collabId') collabId: string,
   ) {
     return await this.noteService.deleteCollaborator(id, collabId);
-  }
-
-  @Post('cluster')
-  @ApiOperation({ summary: 'Create new cluster' })
-  async createCluster(@Body() body: CreateClusterDto, @Req() req) {
-    return await this.noteService.createCluster(body, req.user);
   }
 }
