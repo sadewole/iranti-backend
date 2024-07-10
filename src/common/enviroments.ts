@@ -13,4 +13,11 @@ export default () => ({
     port: process.env.REDIS_PORT,
     host: process.env.REDIS_HOST,
   },
+  mailtrap: {
+    sender_email: process.env.MAIL_SENDER_EMAIL,
+    hostname: process.env.MAIL_HOSTNAME,
+    port: process.env.MAIL_PORT,
+    auth_user: process.env.MAIL_AUTH_USER,
+    auth_pass: process.env.MAIL_AUTH_PASS,
+  },
 });

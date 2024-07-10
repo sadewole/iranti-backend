@@ -9,6 +9,7 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { JwtStrategy } from './strategies';
+import { NotificationModule } from '../notification/notification.module';
 
 const jwtFactory = {
   useFactory: async (configService: ConfigService) => ({
@@ -25,6 +26,7 @@ const jwtFactory = {
     PassportModule,
     JwtModule.registerAsync(jwtFactory),
     TypeOrmModule.forFeature([User]),
+    NotificationModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, PasswordService, UserService, JwtStrategy],

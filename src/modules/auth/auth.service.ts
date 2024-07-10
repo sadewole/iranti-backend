@@ -15,6 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { REDIS_KEYS, generateExpiryCode } from 'src/common/helpers';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +25,7 @@ export class AuthService {
     private userRepository: Repository<User>,
     private readonly passwordService: PasswordService,
     private jwtService: JwtService,
+    private notificationService: NotificationService,
   ) {}
 
   private readonly logger = new Logger(AuthService.name);
@@ -66,11 +68,19 @@ export class AuthService {
         ...body,
         password: hashPassword,
       });
+
       await this.cacheManager.set(
         `${REDIS_KEYS.VERIFY_EMAIL_TOKEN}:${user.id}`,
         code,
         expiryMin,
       );
+
+      await this.notificationService.sendEmail({
+        mailType: 'thankYouSignUp',
+        message: code,
+        subject: 'Welcome to Iranti. Verify your email.',
+        to: [body.email],
+      });
 
       return this.signedUserToken(user);
     } catch (error) {
@@ -96,7 +106,13 @@ export class AuthService {
       expiryMin,
     );
 
-    // TODO: Create a EMAIL notification
+    await this.notificationService.sendEmail({
+      mailType: 'emailVerification',
+      message: code,
+      subject: 'Iranti Email Verification',
+      to: [body.email],
+    });
+
     return { message: 'Verification code sent to email' };
   }
 
@@ -121,6 +137,12 @@ export class AuthService {
       ...user,
       isVerified: true,
       password: undefined,
+    });
+
+    await this.notificationService.sendEmail({
+      mailType: 'emailVerified',
+      subject: 'Congratulations! Your account has been verified.',
+      to: [body.email],
     });
 
     await this.cacheManager.del(`${REDIS_KEYS.VERIFY_EMAIL_TOKEN}:${user.id}`);
