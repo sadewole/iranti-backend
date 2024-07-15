@@ -17,7 +17,7 @@ Welcome to the backend repository for **Iranti**, your ultimate note-taking appl
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (version 14.x or higher)
-- [Docker](https://www.docker.com/) (optional, for containerization)
+- [Docker](https://www.docker.com/)
 
 ### Installation
 
