@@ -12,6 +12,12 @@ import { User } from './user.entity';
 import { Cluster } from './cluster.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
+export enum RecurTypes {
+  daily = 'daily',
+  weekly = 'weekly',
+  monthly = 'monthly',
+}
+
 @Entity()
 export class Note {
   @PrimaryGeneratedColumn('uuid')
@@ -42,6 +48,14 @@ export class Note {
   @JoinColumn({ name: 'clusterId' })
   @ApiProperty({ type: () => Cluster })
   cluster: Cluster;
+
+  @Column({ nullable: true })
+  @ApiProperty()
+  reminderTime: Date;
+
+  @Column({ type: 'enum', enum: RecurTypes, nullable: true })
+  @ApiProperty()
+  recurrencePattern: RecurTypes;
 
   @CreateDateColumn()
   @ApiProperty()
