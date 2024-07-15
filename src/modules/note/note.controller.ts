@@ -42,6 +42,7 @@ export class NoteController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new note' })
+  @ApiResponse({ status: 200, type: Note })
   async createNote(@Req() req, @Body() body: CreateNoteDto): Promise<Note> {
     return await this.noteService.createNote(body, req.user);
   }

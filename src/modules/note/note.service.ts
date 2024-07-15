@@ -83,7 +83,7 @@ export class NoteService {
     });
     if (!cluster) {
       throw new NotFoundException(
-        'Cluster either not found does not belong to you.',
+        'Cluster either not found or does not belong to you.',
       );
     }
 
