@@ -1,5 +1,13 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  IsISO8601,
+  IsEnum,
+} from 'class-validator';
+import { RecurTypes } from 'src/entities/note.entity';
 
 export class CreateNoteDto {
   @ApiProperty()
@@ -16,6 +24,16 @@ export class CreateNoteDto {
   @IsOptional()
   @IsUUID()
   clusterId?: string;
+
+  @ApiProperty({ default: new Date().toISOString(), required: false })
+  @IsISO8601()
+  @IsOptional()
+  reminderTime?: string;
+
+  @ApiProperty({ enum: RecurTypes, required: false })
+  @IsEnum(RecurTypes)
+  @IsOptional()
+  recurrencePattern?: RecurTypes;
 }
 
 export class CreateClusterDto {

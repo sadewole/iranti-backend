@@ -28,7 +28,7 @@ export class Note {
   @ApiProperty()
   title: string;
 
-  @Column('text')
+  @Column('text', { nullable: true, default: '' })
   @ApiProperty()
   description: string;
 
@@ -54,7 +54,7 @@ export class Note {
   reminderTime: Date;
 
   @Column({ type: 'enum', enum: RecurTypes, nullable: true })
-  @ApiProperty()
+  @ApiProperty({ enum: RecurTypes })
   recurrencePattern: RecurTypes;
 
   @CreateDateColumn()

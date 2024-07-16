@@ -13,6 +13,7 @@ import {
   UpdateNoteDto,
 } from './note.dto';
 import { IsEmailDto } from '../auth/auth.dto';
+import { ReminderService } from 'src/jobs/reminder/reminder.service';
 
 @Injectable()
 export class NoteService {
@@ -20,6 +21,7 @@ export class NoteService {
     @InjectRepository(Note) private noteRepository: Repository<Note>,
     @InjectRepository(Cluster) private clusterRepository: Repository<Cluster>,
     @InjectRepository(User) private userRepository: Repository<User>,
+    private reminderService: ReminderService,
   ) {}
 
   async getNotes() {
@@ -135,10 +137,25 @@ export class NoteService {
       await this.getCluster(body.clusterId);
     }
 
-    return await this.noteRepository.save({
+    if (body.recurrencePattern && !body.reminderTime) {
+      throw new BadRequestException(
+        'reminderTime must be provided for recurring reminder',
+      );
+    }
+
+    const note = await this.noteRepository.save({
       ...body,
       userId: user.id,
     });
+
+    if (note.reminderTime) {
+      await this.reminderService.scheduleReminderJobs(
+        note,
+        new Date(note.reminderTime),
+      );
+    }
+
+    return note;
   }
 
   async getNote(id: string, user: User) {

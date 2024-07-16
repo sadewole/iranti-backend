@@ -10,7 +10,6 @@ import { UserModule } from './user/user.module';
 import { NoteModule } from './note/note.module';
 import enviroments from 'src/common/enviroments';
 import { BullModule } from '@nestjs/bull';
-import { QUEUES } from 'src/common/helpers';
 
 @Module({
   imports: [
@@ -48,14 +47,14 @@ import { QUEUES } from 'src/common/helpers';
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) =>
-        <RedisClientOptions>{
-          url: configService.get('redis.url'),
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('redis.host'),
+          port: configService.get('redis.port'),
+          password: configService.get('redis.password'),
         },
+      }),
       inject: [ConfigService],
-    }),
-    BullModule.registerQueue({
-      name: QUEUES.REMINDER.PROCESSOR_NAME,
     }),
   ],
 })
