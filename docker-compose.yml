@@ -8,8 +8,15 @@ services:
   #     dockerfile: ./Dockerfile
   #   environment:
   #     NODE_ENV: production
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  #     - redis
   #   ports:
   #     - 3000:3000
+  #   command: yarn start
+  #   restart: always
 
   db:
     image: postgres:13
