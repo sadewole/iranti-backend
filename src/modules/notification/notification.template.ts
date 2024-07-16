@@ -19,6 +19,11 @@ export const notificationType = {
     header: 'Password reset',
     body: 'You have requested password reset for your Iranti account. Use the code below to reset your password',
   },
+  noteReminder: {
+    sendCode: undefined,
+    header: 'Iranti note reminder',
+    body: 'This is an email reminder about the subject mentioned above.',
+  },
 };
 
 export function HTMLTemplate(

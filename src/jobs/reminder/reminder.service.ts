@@ -42,8 +42,8 @@ export class ReminderService {
 
   async sendMessage(user: User, message: string) {
     await this.notificationService.sendEmail({
-      mailType: 'thankYouSignUp',
-      subject: `Reminder: ${message}`,
+      mailType: 'noteReminder',
+      subject: `Note reminder: ${message}`,
       to: [user.email],
     });
   }

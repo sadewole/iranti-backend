@@ -1,5 +1,5 @@
 import { HTMLTemplate } from './notification.template';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
@@ -12,12 +12,14 @@ type MailDataInput = {
     | 'emailVerification'
     | 'emailVerified'
     | 'thankYouSignUp'
-    | 'passwordReset';
+    | 'passwordReset'
+    | 'noteReminder';
 };
 
 @Injectable()
 export class NotificationService {
   private transport: any;
+  private logger = new Logger(NotificationService.name);
 
   constructor(private configService: ConfigService) {
     this.transport = nodemailer.createTransport({
@@ -36,7 +38,7 @@ export class NotificationService {
 
       const data = {
         ...rest,
-        from: this.configService.get('mailtrap.sender_email'),
+        from: `Iranti <${this.configService.get('mailtrap.sender_email')}>`,
         html: HTMLTemplate(mailType, message),
       };
 
@@ -44,8 +46,8 @@ export class NotificationService {
 
       return res;
     } catch (error) {
-      console.error(error);
-      console.error('<< Error sending email verification >>');
+      this.logger.error(error);
+      this.logger.error('<< Error sending email verification >>');
     }
   }
 }

@@ -142,6 +142,7 @@ export class AuthService {
     await this.notificationService.sendEmail({
       mailType: 'emailVerified',
       subject: 'Congratulations! Your account has been verified.',
+      message: 'VERIFIED!',
       to: [body.email],
     });
 
