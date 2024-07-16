@@ -53,7 +53,7 @@ Welcome to the backend repository for **Iranti**, your ultimate note-taking appl
 ### Connect to docker postgres (unnecessary)
 
 ```
-docker exec -it [your_postgres_container_name] psql -U [your_username] -d [your_database_name]
+docker-compose exec -it [your_postgres_container_name] psql -U [your_username] -d [your_database_name]
 ```
 
 ## API Documentation
