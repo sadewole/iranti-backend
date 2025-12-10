@@ -10,12 +10,14 @@ import { UserModule } from './user/user.module';
 import { NoteModule } from './note/note.module';
 import enviroments from 'src/common/enviroments';
 import { BullModule } from '@nestjs/bull';
+import { ReminderModule } from 'src/jobs/reminder/reminder.module';
 
 @Module({
   imports: [
     AuthModule,
     NoteModule,
     UserModule,
+    ReminderModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [enviroments],
